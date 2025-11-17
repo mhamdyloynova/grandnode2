@@ -41,6 +41,7 @@ services:
       ConnectionStrings__Provider: "0"
       FeatureManagement__Grand.Module.Api: "true"
       FeatureManagement__Grand.Module.MobileApi: "true"
+      FeatureManagement__Grand.Module.Installer: "true"
       FrontendAPI__Enabled: "true"
       BackendAPI__Enabled: "true"
       FrontendAPI__SecretKey: "LoynovaFrontendSecretKey2024!"

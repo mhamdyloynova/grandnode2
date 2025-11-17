@@ -55,8 +55,11 @@ public class ContextMiddleware
         var storeContext = context.RequestServices.GetRequiredService<IStoreContextSetter>();
         contextAccessor.StoreContext = await storeContext.InitializeStoreContext();
 
-        var workContextSetter = context.RequestServices.GetRequiredService<IWorkContextSetter>();
-        contextAccessor.WorkContext = await workContextSetter.InitializeWorkContext(contextAccessor.StoreContext.CurrentStore.Id);
+        if (contextAccessor.StoreContext?.CurrentStore != null)
+        {
+            var workContextSetter = context.RequestServices.GetRequiredService<IWorkContextSetter>();
+            contextAccessor.WorkContext = await workContextSetter.InitializeWorkContext(contextAccessor.StoreContext.CurrentStore.Id);
+        }
 
         //call the next middleware in the request pipeline
         await _next(context);

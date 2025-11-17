@@ -117,8 +117,13 @@ public class EmailSender : IEmailSender
 
         //send email
         using var smtpClient = new SmtpClient();
-        smtpClient.ServerCertificateValidationCallback =
-            (_, _, _, _) => emailAccount.UseServerCertificateValidation;
+        // Only set custom validation callback if explicitly disabled for testing
+        // Otherwise, use default validation which properly validates certificates
+        if (!emailAccount.UseServerCertificateValidation)
+        {
+            // WARNING: This is insecure and should only be used for testing
+            smtpClient.ServerCertificateValidationCallback = (_, _, _, _) => true;
+        }
         await smtpClient.ConnectAsync(emailAccount.Host, emailAccount.Port,
             (SecureSocketOptions)emailAccount.SecureSocketOptionsId);
         await smtpClient.AuthenticateAsync(emailAccount.Username, emailAccount.Password);

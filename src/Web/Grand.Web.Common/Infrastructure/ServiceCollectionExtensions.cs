@@ -254,7 +254,7 @@ public static class ServiceCollectionExtensions
                 var storeId = "";
                 var settingService = x.GetRequiredService<ISettingService>();
                 var contextAccessor = x.GetRequiredService<IContextAccessor>();
-                if (contextAccessor.StoreContext != null)
+                if (contextAccessor?.StoreContext?.CurrentStore != null)
                     storeId = contextAccessor.StoreContext.CurrentStore.Id;
 
                 return settingService.LoadSetting(type, storeId);

@@ -162,6 +162,9 @@ public class PermissionService : IPermissionService
     /// <returns>true - authorized; otherwise, false</returns>
     public virtual async Task<bool> Authorize(Permission permission)
     {
+        if (_contextAccessor?.WorkContext?.CurrentCustomer == null)
+            return false;
+            
         return await Authorize(permission, _contextAccessor.WorkContext.CurrentCustomer);
     }
 
@@ -189,6 +192,9 @@ public class PermissionService : IPermissionService
     /// <returns>true - authorized; otherwise, false</returns>
     public virtual async Task<bool> Authorize(string permissionSystemName)
     {
+        if (_contextAccessor?.WorkContext?.CurrentCustomer == null)
+            return false;
+            
         return await Authorize(permissionSystemName, _contextAccessor.WorkContext.CurrentCustomer);
     }
 
@@ -262,6 +268,9 @@ public class PermissionService : IPermissionService
     public virtual async Task<bool> AuthorizeAction(string permissionSystemName, string permissionActionName)
     {
         if (string.IsNullOrEmpty(permissionSystemName) || string.IsNullOrEmpty(permissionActionName))
+            return false;
+
+        if (_contextAccessor?.WorkContext?.CurrentCustomer == null)
             return false;
 
         if (!await Authorize(permissionSystemName))
