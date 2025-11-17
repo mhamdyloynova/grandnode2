@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: loynova-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: LoynovaPass123!
+      MONGO_INITDB_DATABASE: grandnodedb
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    ports:
+      - "27017:27017"
+    networks:
+      - loynova-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # GrandNode2 Web Application Service  
+  loynovagrandnode2:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-latest}
+        GIT_BRANCH: ${GIT_BRANCH:-main}
+    container_name: LoynovaGrandNode2
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Mongodb: mongodb://admin:LoynovaPass123!@mongodb:27017/grandnodedb?authSource=admin
+      ConnectionStrings__Provider: "0"
+      FeatureManagement__Grand.Module.Api: "true"
+      FrontendAPI__Enabled: "true"
+      BackendAPI__Enabled: "true"
+      FrontendAPI__SecretKey: "LoynovaFrontendSecretKey2024!"
+      BackendAPI__SecretKey: "LoynovaBackendSecretKey2024!"
+      Database__UseLiteDb: "false"
+      Security__UseHttpsRedirection: "false"
+      Security__CookieSecurePolicyAlways: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_data:/app/App_Data
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - loynova-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  mongodb_data:
+    driver: local
+  app_data:
+    driver: local
+
+networks:
+  loynova-network:
+    driver: bridge

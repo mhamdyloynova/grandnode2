@@ -1,0 +1,143 @@
+{
+  "Application": {
+    "DisplayFullErrorStack": false,
+    "StaticFilesCacheControl": "public,max-age=31536000",
+    "UseSessionStateTempDataProvider": false,
+    "SeoFriendlyUrlsForLanguagesEnabled": false,
+    "SeoFriendlyUrlsDefaultCode": "en",
+    "AllowNonAsciiCharInHeaders": false,
+    "MaxRequestBodySize": null,
+    "EnableContextLoggingMiddleware": true
+  },
+  "ConnectionStrings": {
+    "Mongodb": "mongodb://admin:LoynovaPass123!@mongodb:27017/grandnodedb?authSource=admin",
+    "Provider": "0"
+  },
+  "Database": {
+    "UseLiteDb": false,
+    "Singleton": true,
+    "LiteDbConnectionString": ""
+  },
+  "Security": {
+    "UseForwardedHeaders": false,
+    "ForceUseHTTPS": false,
+    "AllowedHosts": "*",
+    "UseDefaultSecurityHeaders": true,
+    "UseHsts": false,
+    "EnableRuntimeCompilation": false,
+    "UseHttpsRedirection": false,
+    "HttpsRedirectionRedirect": 308,
+    "HttpsRedirectionHttpsPort": 443,
+    "KeyPersistenceLocation": "/app/App_Data/DataProtectionKeys",
+    "CookieAuthExpires": 8760,
+    "CookiePrefix": ".Grand.",
+    "CookieClaimsIssuer": "grandnode",
+    "CookieSecurePolicyAlways": false,
+    "CookieSameSite": "Lax",
+    "CookieSameSiteExternalAuth": "None",
+    "AuthorizeAdminMenu": false
+  },
+  "Cache": {
+    "DefaultCacheTimeMinutes": 60
+  },
+  "Extensions": {
+    "UseRoslynScripts": false,
+    "DisableUploadExtensions": false,
+    "PluginSkipLoadingPattern": "",
+    "ClearPluginShadowDirectoryOnStartup": true,
+    "PluginShadowCopy": true,
+    "InstalledPlugins": ""
+  },
+  "AccessControl": {
+    "IgnoreAcl": false,
+    "IgnoreStoreLimitations": false
+  },
+  "Performance": {
+    "UseResponseCompression": true,
+    "IgnoreUsePoweredByMiddleware": false
+  },
+  "FeatureManagement": {
+    "Grand.Module.Installer": true,
+    "Grand.Module.Migration": true,
+    "Grand.Module.ScheduledTasks": true,
+    "Grand.Module.Api": true
+  },
+  "Redis": {
+    "RedisPubSubEnabled": false,
+    "RedisPubSubConnectionString": "",
+    "RedisPubSubChannel": "",
+    "PersistKeysToRedis": false,
+    "PersistKeysToRedisUrl": ""
+  },
+  "UrlRewrite": {
+    "UseUrlRewrite": false,
+    "UrlRewriteHttpsOptions": false,
+    "UrlRewriteHttpsOptionsStatusCode": 303,
+    "UrlRewriteHttpsOptionsPort": 443,
+    "UrlRedirectToHttpsPermanent": false
+  },
+  "Azure": {
+    "AzureBlobStorageConnectionString": "",
+    "AzureBlobStorageContainerName": "",
+    "AzureBlobStorageEndPoint": "",
+    "PersistKeysAzureBlobStorageConnectionString": "",
+    "PersistKeysToAzureKeyVault": false,
+    "PersistKeysToAzureBlobStorage": false,
+    "DataProtectionContainerName": "",
+    "DataProtectionBlobName": "keys.xml",
+    "KeyIdentifier": "",
+    "AppConfiguration": "",
+    "AppKeyPrefix": ""
+  },
+  "Amazon": {
+    "AmazonAwsAccessKeyId": "",
+    "AmazonAwsSecretAccessKey": "",
+    "AmazonBucketName": "",
+    "AmazonRegion": "",
+    "AmazonDistributionDomainName": ""
+  },
+  "FacebookSettings": {
+    "AppId": "",
+    "AppSecret": ""
+  },
+  "GoogleSettings": {
+    "ClientId": "",
+    "ClientSecret": ""
+  },
+  "FrontendAPI": {
+    "Enabled": true,
+    "JsonContentType": false,
+    "SecretKey": "LoynovaFrontendSecretKey2024!",
+    "ValidateIssuer": false,
+    "ValidIssuer": "",
+    "ValidateAudience": false,
+    "ValidAudience": "",
+    "ValidateLifetime": true,
+    "ValidateIssuerSigningKey": true,
+    "ExpiryInMinutes": 1440,
+    "RefreshTokenExpiryInMinutes": 1440
+  },
+  "BackendAPI": {
+    "Enabled": true,
+    "SecretKey": "LoynovaBackendSecretKey2024!",
+    "ValidateIssuer": false,
+    "ValidIssuer": "",
+    "ValidateAudience": false,
+    "ValidAudience": "",
+    "ValidateLifetime": true,
+    "ValidateIssuerSigningKey": true,
+    "ExpiryInMinutes": 1440,
+    "SystemModel": true
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "System": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "ApplicationInsights": {
+    "ConnectionString": ""
+  }
+}

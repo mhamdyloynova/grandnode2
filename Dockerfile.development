@@ -1,0 +1,55 @@
+# Development Dockerfile for GrandNode2 with API support
+# This version runs in Development mode to enable API documentation
+
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
+LABEL stage=build-env
+WORKDIR /app
+
+# Copy everything to maintain proper structure
+COPY . .
+
+ARG GIT_COMMIT
+ARG GIT_BRANCH
+
+# Restore packages
+RUN dotnet restore GrandNode.sln
+
+# Build solution
+RUN dotnet build GrandNode.sln -c Release --no-restore
+
+# Publish the web project
+RUN dotnet publish src/Web/Grand.Web/Grand.Web.csproj \
+    -c Release \
+    -o ./publish \
+    --no-restore \
+    --no-build \
+    -p:SourceRevisionId=${GIT_COMMIT} \
+    -p:GitBranch=${GIT_BRANCH}
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8080
+WORKDIR /app
+
+# Create App_Data directory and set permissions
+RUN mkdir -p App_Data/DataProtectionKeys App_Data/Download App_Data/TempUploads && \
+    chmod -R 755 App_Data
+
+# Copy published application
+COPY --from=build-env /app/publish .
+
+# Configure ASP.NET Core for Development mode
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_DETAILEDERRORS=true
+ENV ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
+
+# Run as root for development (permissions fix for App_Data)
+USER root
+
+ENTRYPOINT ["dotnet", "Grand.Web.dll"]

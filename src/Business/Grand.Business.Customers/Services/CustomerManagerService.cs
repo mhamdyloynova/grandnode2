@@ -84,6 +84,9 @@ public class CustomerManagerService : ICustomerManagerService
             ? await _customerService.GetCustomerByUsername(usernameOrEmail)
             : await _customerService.GetCustomerByEmail(usernameOrEmail);
 
+        if (customer == null)
+            return CustomerLoginResults.CustomerNotExist;
+
         var pwd = customer.PasswordFormatId switch {
             PasswordFormat.Clear => password,
             PasswordFormat.Encrypted => _encryptionService.EncryptText(password, customer.PasswordSalt),

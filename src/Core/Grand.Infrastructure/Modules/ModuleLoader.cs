@@ -66,8 +66,7 @@ public static class ModuleLoader
 
         try
         {
-            var assemblyLoadContext = new ModuleLoadContext();
-            LoadModuleDependencies(modulePath, assemblyLoadContext, mvcCoreBuilder, logger);
+            LoadModuleDependencies(modulePath, mvcCoreBuilder, logger);
             logger.LogInformation("Module '{ModuleName}' has been successfully loaded.", moduleName);
         }
         catch (Exception ex)
@@ -76,21 +75,30 @@ public static class ModuleLoader
                 moduleName, ex.Message);
         }
     }
-    private static void LoadModuleDependencies(string modulePath, ModuleLoadContext assemblyLoadContext,
+    
+    private static void LoadModuleDependencies(string modulePath,
             IMvcCoreBuilder mvcCoreBuilder, ILogger logger)
     {
         var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Select(a => a.Location)
+            .Select(a => a.GetName().Name)
             .ToHashSet();
 
         foreach (var dependencyDll in Directory.GetFiles(modulePath, "*.dll"))
         {
-            if (loadedAssemblies.Contains(dependencyDll))
+            var assemblyName = AssemblyName.GetAssemblyName(dependencyDll).Name;
+            
+            // Skip ALL assemblies that are already loaded to avoid version conflicts
+            // This prevents loading duplicate assemblies with different versions
+            if (loadedAssemblies.Contains(assemblyName))
+            {
+                logger.LogDebug("Skipping {AssemblyName} - already loaded in default context", assemblyName);
                 continue;
+            }
 
             try
             {
-                var assembly = assemblyLoadContext.LoadFromAssemblyPath(dependencyDll);
+                // Load into DEFAULT context for proper type identity
+                var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dependencyDll);
                 AddApplicationPart(mvcCoreBuilder, assembly);
                 logger.LogDebug("Successfully loaded dependency: {Dependency}", dependencyDll);
             }
@@ -120,14 +128,6 @@ public static class ModuleLoader
             var applicationPartFactory = ApplicationPartFactory.GetApplicationPartFactory(relatedAssembly);
             foreach (var part in applicationPartFactory.GetApplicationParts(relatedAssembly))
                 mvcCoreBuilder.PartManager.ApplicationParts.Add(part);
-        }
-    }
-
-    private class ModuleLoadContext : AssemblyLoadContext
-    {
-        public ModuleLoadContext() : base(isCollectible: true)
-        {
-
         }
     }
 }

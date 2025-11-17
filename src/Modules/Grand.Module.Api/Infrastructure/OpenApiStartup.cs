@@ -25,8 +25,31 @@ public class OpenApiStartup : IStartupApplication
         {
             application.MapScalarApiReference(options =>
             {
-                options.WithTitle("OpenApi Playground");
-                options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);   
+                options.WithTitle("GrandNode2 API Documentation");
+                options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                options.WithTheme(ScalarTheme.Purple);
+            });
+            
+            // Map individual API versions for Scalar
+            application.MapScalarApiReference("v1", options =>
+            {
+                options.WithTitle("Admin API v1 - GrandNode2");
+                options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                options.WithTheme(ScalarTheme.Default);
+            });
+            
+            application.MapScalarApiReference("v2", options =>
+            {
+                options.WithTitle("Frontend API v2 - GrandNode2");
+                options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                options.WithTheme(ScalarTheme.Default);
+            });
+            
+            application.MapScalarApiReference("v3", options =>
+            {
+                options.WithTitle("Mobile API v3 - GrandNode2");
+                options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                options.WithTheme(ScalarTheme.Purple);
             });
         }
     }
@@ -36,8 +59,11 @@ public class OpenApiStartup : IStartupApplication
         var backendApiConfig = services.BuildServiceProvider().GetService<BackendAPIConfig>();
         var frontApiConfig = services.BuildServiceProvider().GetService<FrontendAPIConfig>();
         var webHostEnvironment = services.BuildServiceProvider().GetService<IWebHostEnvironment>();
+        
+        // Check if Mobile API is enabled
+        var mobileApiEnabled = configuration.GetSection("FeatureManagement:Grand.Module.MobileApi").Get<bool>();
 
-        if (webHostEnvironment.IsDevelopment() && (backendApiConfig.Enabled || frontApiConfig.Enabled))
+        if (webHostEnvironment.IsDevelopment() && (backendApiConfig.Enabled || frontApiConfig.Enabled || mobileApiEnabled))
         {
             if (backendApiConfig.Enabled)
             {
@@ -46,6 +72,10 @@ public class OpenApiStartup : IStartupApplication
             if (frontApiConfig.Enabled)
             {
                 ConfigureFrontendApi(services);
+            }
+            if (mobileApiEnabled)
+            {
+                ConfigureMobileApi(services);
             }
         }
 
@@ -93,5 +123,17 @@ public class OpenApiStartup : IStartupApplication
 
         //api description provider
         services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, MetadataApiDescriptionProvider>());
+    }
+
+    private static void ConfigureMobileApi(IServiceCollection services)
+    {
+        services.AddOpenApi(ApiConstants.ApiGroupNameV3, options =>
+        {
+            options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
+            options.AddContactDocumentTransformer("GrandNode2 Mobile API", ApiConstants.ApiGroupNameV3);
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            options.AddSchemaTransformer<EnumSchemaTransformer>();
+            options.AddClearServerDocumentTransformer();
+        });
     }
 }
