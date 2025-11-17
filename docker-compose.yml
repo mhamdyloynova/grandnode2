@@ -14,7 +14,7 @@ services:
       - mongodb_data:/data/db
       - ./mongo-init:/docker-entrypoint-initdb.d
     ports:
-      - "27017:27017"
+      - "27018:27017"
     networks:
       - loynova-network
     healthcheck:
@@ -35,20 +35,41 @@ services:
     container_name: LoynovaGrandNode2
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Mongodb: mongodb://admin:LoynovaPass123!@mongodb:27017/grandnodedb?authSource=admin
       ConnectionStrings__Provider: "0"
       FeatureManagement__Grand.Module.Api: "true"
+      FeatureManagement__Grand.Module.MobileApi: "true"
       FrontendAPI__Enabled: "true"
       BackendAPI__Enabled: "true"
       FrontendAPI__SecretKey: "LoynovaFrontendSecretKey2024!"
       BackendAPI__SecretKey: "LoynovaBackendSecretKey2024!"
+      API__Enabled: "true"
+      API__EnableSwaggerUI: "true"
+      API__EnableJwtAuthentication: "true"
+      MobileApi__Enabled: "true"
+      MobileApi__SecretKey: "LoynovalMobileApiSecretKey2024MustBe32CharsMin!"
+      MobileApi__ValidateIssuer: "true"
+      MobileApi__ValidIssuer: "grandnode-mobile-api"
+      MobileApi__ValidateAudience: "true"
+      MobileApi__ValidAudience: "grandnode-mobile-app"
+      MobileApi__ValidateLifetime: "true"
+      MobileApi__ValidateIssuerSigningKey: "true"
+      MobileApi__ExpiryInMinutes: "60"
+      MobileApi__RefreshTokenExpiryInMinutes: "1440"
+      MobileApi__AllowGuestUsers: "true"
+      MobileApi__RequireHttps: "false"
+      MobileApi__MaxRequestsPerMinute: "60"
+      MobileApi__EnableDocumentation: "true"
+      MobileApi__DocumentationTitle: "GrandNode2 Mobile API"
+      MobileApi__DocumentationDescription: "Mobile-optimized REST API for GrandNode2 e-commerce platform"
       Database__UseLiteDb: "false"
       Security__UseHttpsRedirection: "false"
       Security__CookieSecurePolicyAlways: "false"
+      Security__KeyPersistenceLocation: "/app/App_Data/DataProtectionKeys"
     ports:
-      - "8080:8080"
+      - "8082:8080"
     volumes:
       - app_data:/app/App_Data
     depends_on:

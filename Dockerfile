@@ -41,16 +41,9 @@ WORKDIR /app
 # Copy published application first
 COPY --from=build-env /app/build/release .
 
-# Create App_Data directory structure and set permissions
+# Create App_Data directory structure with full permissions
 RUN mkdir -p App_Data/DataProtectionKeys App_Data/Download App_Data/TempUploads && \
     chmod -R 777 App_Data
-
-# Create a non-root user and set ownership
-RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /app
-
-# Switch to the non-root user
-USER appuser
 
 # Configure ASP.NET Core
 ENV ASPNETCORE_URLS=http://+:8080

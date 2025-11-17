@@ -56,8 +56,13 @@ public class OpenApiStartup : IStartupApplication
 
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        var backendApiConfig = services.BuildServiceProvider().GetService<BackendAPIConfig>();
-        var frontApiConfig = services.BuildServiceProvider().GetService<FrontendAPIConfig>();
+        // Read configuration directly from IConfiguration instead of service provider
+        var backendApiConfig = new BackendAPIConfig();
+        configuration.GetSection("BackendAPI").Bind(backendApiConfig);
+        
+        var frontApiConfig = new FrontendAPIConfig();
+        configuration.GetSection("FrontendAPI").Bind(frontApiConfig);
+        
         var webHostEnvironment = services.BuildServiceProvider().GetService<IWebHostEnvironment>();
         
         // Check if Mobile API is enabled
